@@ -1,51 +1,124 @@
-# GoLedger Challenge
+# GoLedger Challenge Web App
 
-In this challenge you will create a web interface to a blockchain application. In this application you must implement a imdb-like interface, to catalogue TV Shows, with series, seasons, episodes and watchlist registration.
+Aplicacao React para o desafio GoLedger com foco em arquitetura limpa, UX moderna e operacoes completas de CRUD para os ativos:
 
-# Requirements
+- tvShows
+- seasons
+- episodes
+- watchlist (favoritos)
 
-- Your application should be able to add/remove/edit and show all tv shows, seasons, episodes and watchlists;
-- Use **React** or **Next.js** (all UI libraries are allowed);
+## Stack
 
-## Instructions
+- React 19 + Vite
+- React Query para cache e sincronizacao de dados
+- Axios para cliente HTTP
+- React Hook Form + Zod para formularios e validacao
 
-- Fork the repository [https://github.com/goledgerdev/goledger-challenge-web](https://github.com/goledgerdev/goledger-challenge-web)
-    - Fork it, do **NOT** clone it, since you will need to send us your forked repository
-    - If you **cannot** fork it, create a private repository and give access to `andremacedopv` and `lucas-campelo`.
-- Create an web application using React. You will implement the basic operations provided by the API, which are `Create`, `Update`, `Delete` and `Search`.
-- Improve your application with a beautiful UI.
+## Arquitetura
 
-## Server
+Estrutura principal:
 
-The data are obtained using a rest server at this address: `http://ec2-50-19-36-138.compute-1.amazonaws.com`
+- src/api: cliente HTTP e chamadas dos endpoints da API blockchain
+- src/core: configuracoes e utilitarios compartilhados
+- src/features/assets: regras da feature de ativos e hooks de dominio
+- src/components: componentes reaproveitaveis de interface
 
-Also, a Swagger with the endpoints specifications for the operations is provided at this address: `http://ec2-50-19-36-138.compute-1.amazonaws.com/api-docs/index.html`.
+Principios aplicados:
 
-Note: The API is protected with Basic Auth. The credentials were sent to you by email.
+- separacao clara entre camada de dados, regras e apresentacao
+- mutacoes e cache centralizados no React Query
+- formulários desacoplados com validacao robusta
+- configuracao por variavel de ambiente para credenciais e chaves primarias
 
-Tip: execute each operation in the Swagger for information on payload format and endpoint addresses. See examples below.
+## Configuracao de ambiente
 
-### Get Schema
-Execute a `getSchema` operation to get information on which asset types are available. Don't forget to authenticate with the credentials provided.
+1. Copie o arquivo de exemplo:
 
-```bash
-curl -X POST "http://ec2-50-19-36-138.compute-1.amazonaws.com/api/query/getSchema" -H "accept: */*" -H "Content-Type: application/json"
-```
+	PowerShell: Copy-Item .env.example .env
 
-Execute a getSchema with a payload to get more details on a particula asset.
+Ja deixei um arquivo .env criado no projeto com os valores padrao. Falta apenas preencher usuario e senha.
 
-```bash
-curl -X POST "http://ec2-50-19-36-138.compute-1.amazonaws.com/api/query/getSchema" -H "accept: */*" -H "Content-Type: application/json" -d "{\"assetType\":\"tvShows\"}"
-```
-Tip: the same can be done with transactions, using the `getTx` endpoint.
+2. Preencha no arquivo .env:
 
-### Search
-Perform a search query on a particular asset type.
-```bash
-curl -X POST "http://ec2-50-19-36-138.compute-1.amazonaws.com/api/query/search" -H "accept: */*" -H "Content-Type: application/json" -d "{\"query\":{\"selector\":{\"@assetType\":\"seasons\"}}}"
-```
-Tip: to read a specific asset, you can use the `readAsset` endpoint.
+- VITE_API_USER
+- VITE_API_PASSWORD
+- opcional: VITE_PRIMARY_KEYS_JSON para inferencia de chave por tipo de ativo
 
-## Complete the challenge
+Exemplo:
 
-To complete the challenge, you must send us the link to your forked repository with the code of your application. Please, provide instructions to execute the code.
+VITE_PRIMARY_KEYS_JSON={"tvShows":["id"],"seasons":["id","tvShowId"],"episodes":["id","seasonId"],"watchlist":["id","userId"]}
+
+## Rodando o projeto
+
+1. Instalar dependencias:
+
+	npm install
+
+2. Rodar em desenvolvimento:
+
+	npm run dev
+
+3. Build de producao:
+
+	npm run build
+
+4. Preview local:
+
+	npm run preview
+
+## Checklist de validacao rapida
+
+1. Validar acesso da API com credenciais:
+
+	npm run check:api
+
+2. Iniciar frontend:
+
+	npm run dev
+
+3. Testar fluxo na tela:
+
+- Search: aplicar filtro {} e verificar listagem
+- Create: criar um ativo com campos do schema
+- Update: editar um item pela acao Editar
+- Delete: remover pela acao Remover
+
+4. Validar qualidade tecnica:
+
+	npm run lint
+	npm run build
+
+## Endpoints utilizados
+
+Base da API:
+
+- http://ec2-50-19-36-138.compute-1.amazonaws.com/api
+
+Operacoes implementadas:
+
+- POST /query/search
+- POST /query/getSchema
+- POST /invoke/createAsset
+- PUT /invoke/updateAsset
+- DELETE /invoke/deleteAsset
+
+## Entrega do desafio com fork
+
+Fluxo recomendado:
+
+1. Faça fork de https://github.com/goledgerdev/goledger-challenge-web na sua conta GitHub.
+2. Clone o fork para sua maquina.
+3. Copie o conteudo desta aplicacao para dentro do repositorio forkado.
+4. Commit e push no seu fork.
+5. Envie o link do seu fork para avaliacao.
+
+Comandos git exemplo:
+
+git init
+git add .
+git commit -m "feat: implementa dashboard CRUD blockchain para catalogo de tv"
+git branch -M main
+git remote add origin URL_DO_SEU_FORK
+git push -u origin main
+
+Se nao conseguir forkar, crie repositorio privado e conceda acesso aos usuarios solicitados no enunciado.
